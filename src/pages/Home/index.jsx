@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import ButtonAppBar from '../../components/ButtonAppBar';
-import { Box, Typography, Button, TextField } from '@mui/material';
+import { Box, Typography, Button, TextField, Snackbar, Alert } from '@mui/material';
 import MyDataGrid from '../../components/DataGrid';
 import ClientModal from '../../components/ModalForm';
 import axios from 'axios';
@@ -12,6 +12,9 @@ function Home() {
     const [filter, setFilter] = useState('');
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const addClient = async (clientData) => {
         try {
@@ -24,15 +27,20 @@ function Home() {
     };
 
     const handleSubmit = async (values, { setSubmitting }) => {
-        const transformedValues = {
-            ...values,
-        };
+        const transformedValues = { ...values };
         try {
             await addClient(transformedValues);
-            alert("Cliente adicionado com sucesso!");
+            setSnackbarMessage("Cliente adicionado com sucesso!");
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+    
             handleClose();
         } catch (error) {
-            alert("Ocorreu um erro ao adicionar o cliente.");
+            
+            const errorMessage = error.response?.data?.message || "Ocorreu um erro ao adicionar o cliente.";
+            setSnackbarMessage(errorMessage);
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
         } finally {
             setSubmitting(false);
         }
@@ -81,6 +89,17 @@ function Home() {
                 senha: '',
                 confirmarSenha: ''
             }} handleSubmit={handleSubmit} />
+            <div>
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={() => setOpenSnackbar(false)}
+                >
+                    <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+            </div>
         </div>
     );
 }

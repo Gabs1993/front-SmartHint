@@ -1,14 +1,15 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid  } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Button, Checkbox } from '@mui/material';
+import { Button, Checkbox, Snackbar, Alert } from '@mui/material';
 import ClientModal from '../ModalForm';
 import { format } from 'date-fns';
 
 
-export default function MyDataGrid( { filter } ) {
+
+export default function MyDataGrid({ filter }) {
     const [rows, setRows] = React.useState([]);
     const [allRows, setAllRows] = useState([]);
     const [pageNumber, setPageNumber] = useState(1);
@@ -16,6 +17,10 @@ export default function MyDataGrid( { filter } ) {
     const [totalRows, setTotalRows] = useState(0);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [clientToEdit, setClientToEdit] = useState(null);
+    const [openSnackbar, setOpenSnackbar] = React.useState(false);
+    const [snackbarMessage, setSnackbarMessage] = React.useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = React.useState('success');
+
 
     const handleUpdate = (clientData) => {
         setClientToEdit(clientData);
@@ -26,20 +31,20 @@ export default function MyDataGrid( { filter } ) {
         { field: 'nomeRazaoSocial', headerName: 'Nome/Razão Social', width: 200, editable: true },
         { field: 'email', headerName: 'E-mail', width: 200, editable: true },
         { field: 'telefone', headerName: 'Telefone', width: 150, editable: true },
-        { 
-            field: 'dateNascimento', 
-            headerName: 'Data de Cadastro', 
-            width: 180, 
+        {
+            field: 'dateNascimento',
+            headerName: 'Data de Cadastro',
+            width: 180,
             editable: true,
             renderCell: (params) => {
                 const formattedDate = format(new Date(params.value), 'dd/MM/yyyy');
                 return formattedDate;
             }
         },
-        { 
-            field: 'bloqueado', 
-            headerName: 'Bloqueado', 
-            width: 130, 
+        {
+            field: 'bloqueado',
+            headerName: 'Bloqueado',
+            width: 130,
             editable: true,
             renderCell: (params) => (
                 <Checkbox
@@ -90,15 +95,15 @@ export default function MyDataGrid( { filter } ) {
         setTotalRows(filteredRows.length);
     }, [filter, allRows]);
 
-    
+
 
     const handlePageChange = (params) => {
-        setPageNumber(params.page + 1); 
+        setPageNumber(params.page + 1);
     };
 
     const handlePageSizeChange = (params) => {
         setPageSize(params.pageSize);
-        setPageNumber(1); 
+        setPageNumber(1);
     };
 
 
@@ -111,16 +116,21 @@ export default function MyDataGrid( { filter } ) {
     const handleEditSubmit = async (values, { setSubmitting }) => {
         try {
             const response = await axios.put(`https://localhost:7049/api/Client/${values.id}`, values);
-            alert('Cliente atualizado com sucesso!');
 
-            setRows((prevRows) => 
-                prevRows.map((row) => 
+            setSnackbarMessage('Cliente atualizado com sucesso!');
+            setSnackbarSeverity('success');
+            setOpenSnackbar(true);
+
+            setRows((prevRows) =>
+                prevRows.map((row) =>
                     row.id === values.id ? { ...row, ...values } : row
                 )
             );
             handleCloseEditModal();
         } catch (error) {
-            alert('Ocorreu um erro ao atualizar o cliente.');
+            setSnackbarMessage('Ocorreu um erro ao atualizar o cliente.');
+            setSnackbarSeverity('error');
+            setOpenSnackbar(true);
         } finally {
             setSubmitting(false);
         }
@@ -137,7 +147,7 @@ export default function MyDataGrid( { filter } ) {
                     pagination: {
                         paginationModel: {
                             pageSize: 20,
-                          },
+                        },
                     }
                 }}
             />
@@ -160,6 +170,17 @@ export default function MyDataGrid( { filter } ) {
                 }}
                 handleSubmit={handleEditSubmit}
             />
+            <div>
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={() => setOpenSnackbar(false)}
+                >
+                    <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                        {snackbarMessage}
+                    </Alert>
+                </Snackbar>
+            </div>
         </Box>
     );
 }
