@@ -8,8 +8,9 @@ import ClientModal from '../ModalForm';
 import { format } from 'date-fns';
 
 
-export default function MyDataGrid() {
+export default function MyDataGrid( { filter } ) {
     const [rows, setRows] = React.useState([]);
+    const [allRows, setAllRows] = useState([]);
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize, setPageSize] = useState(20);
     const [totalRows, setTotalRows] = useState(0);
@@ -69,6 +70,7 @@ export default function MyDataGrid() {
                 const response = await axios.get(
                     `https://localhost:7049/api/Client/buscarTodos?pageNumber=${pageNumber}&pageSize=${pageSize}`
                 );
+                setAllRows(response.data.items || []);
                 setRows(response.data.items || []);
                 setTotalRows(response.data.totalRecords || pageNumber);
             } catch (error) {
@@ -78,6 +80,17 @@ export default function MyDataGrid() {
 
         fetchData();
     }, [pageNumber, pageSize]);
+
+
+    useEffect(() => {
+        const filteredRows = allRows.filter(row =>
+            row.nomeRazaoSocial.toLowerCase().includes(filter.toLowerCase())
+        );
+        setRows(filteredRows);
+        setTotalRows(filteredRows.length);
+    }, [filter, allRows]);
+
+    
 
     const handlePageChange = (params) => {
         setPageNumber(params.page + 1); 

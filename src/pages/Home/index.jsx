@@ -1,13 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import ButtonAppBar from '../../components/ButtonAppBar';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, TextField } from '@mui/material';
 import MyDataGrid from '../../components/DataGrid';
 import ClientModal from '../../components/ModalForm';
 import axios from 'axios';
 
 
+
 function Home() {
     const [open, setOpen] = React.useState(false);
+    const [filter, setFilter] = useState('');
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -54,8 +56,15 @@ function Home() {
                 <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleOpen}>
                     Adicionar Cliente
                 </Button>
+                <TextField
+                    label="Filtrar"
+                    variant="outlined"
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    sx={{ mt: 2 }}
+                />
                 <Box sx={{ mt: 4 }}>
-                    <MyDataGrid />
+                    <MyDataGrid filter={filter} />
                 </Box>
             </Box>
             <ClientModal open={open} handleClose={handleClose} initialValues={{
