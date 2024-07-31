@@ -1,8 +1,31 @@
 # React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Utilizado o template do vite junto com o React
 
-Currently, two official plugins are available:
+## Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- NodeJs
+
+## Configuração do Ambiente
+
+Realizar o clone do repositorio: 
+
+```bash
+git clone https://github.com/Gabs1993/front-SmartHint.git
+````
+
+Depois ir para o caminho do projto
+
+cd SmartHint e executar o camando: 
+
+```bash
+npm i ou npm install
+````
+
+Este comando baixara todas as dependencias para rodar a aplicação. Depois é só executar: 
+
+```bash
+npm run dev
+````
+
+e o projeto será inicializado no seu navegador padrão!
